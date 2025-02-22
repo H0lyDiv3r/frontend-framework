@@ -1,5 +1,3 @@
-
-
 const addEventListener = (eventName,handler,el) => {
     el.addEventListener(eventName,handler)
     return handler
@@ -12,4 +10,9 @@ export const addEventListeners = (listeners={},el)=>{
         addedListeners[eventName] = listener
     })
     return addedListeners
+}
+export const removeEventListeners = (listeners,el)=>{
+    Object.entries(listeners).forEach(([eventName,handler])=>{
+        el.removeEventListener(eventName,handler)
+    })
 }
