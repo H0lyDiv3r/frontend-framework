@@ -4,6 +4,7 @@
   "main": "index.js",
   "description":"A Project to learn how to write a frontend framework",
   "private":true,
+  "type":"module",
   "workspaces":[
   	"packages/runtime",
 	"packages/compiler",

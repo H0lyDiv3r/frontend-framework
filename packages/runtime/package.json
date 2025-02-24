@@ -2,6 +2,7 @@
   "name": "fe-fwk-runtime",
   "version": "1.0.0",
   "main": "dist/fe-fwk.js",
+  "type":"module",
   "files": [
     "dist/fe-fwk.js"
   ],
