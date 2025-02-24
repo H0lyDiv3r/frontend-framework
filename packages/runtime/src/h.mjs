@@ -28,5 +28,3 @@ export const hFragment = (vNodes)=>{
     children: mapTextNodes(withoutNulls(vNodes))
   }
 }
-
-console.log(h('div',null,[h('ul',null,[h('li',null,['one']),h('li',null,['two'])])]))

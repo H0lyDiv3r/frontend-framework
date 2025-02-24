@@ -1,6 +1,6 @@
 import { setAttributes } from './attributes.mjs';
 import { addEventListeners } from './events.mjs';
-import {DOM_TYPES} from './h'
+import {DOM_TYPES} from './h.mjs'
 
 
 export const mountDom = (vdom,parentEl)=>{
