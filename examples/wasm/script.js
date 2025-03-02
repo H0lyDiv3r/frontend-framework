@@ -4,5 +4,8 @@ WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then(
     (result) => {
         go.run(result.instance);
         window.mountDom(document.body);
+        setTimeout(() => {
+            window.removeDom();
+        }, 2000);
     },
 );

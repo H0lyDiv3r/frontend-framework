@@ -71,6 +71,7 @@ func (vdom *StringDom) RemoveNode() {
 }
 
 func MountDom(vdom Vdom, parentEl js.Value) {
+	fmt.Println("printing the pointer", vdom)
 	vdom.CreateNode(parentEl)
 }
 

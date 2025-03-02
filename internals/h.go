@@ -1,6 +1,7 @@
 package internals
 
 import (
+	"fmt"
 	"go-fe-fwk/types"
 	"reflect"
 )
@@ -12,6 +13,7 @@ func H(tag string, props types.Props, children []any) *ElementNode {
 			textNode := Hstring(child.(string))
 			newChildren = append(newChildren, &textNode)
 		} else {
+			fmt.Println("showing children", child)
 			newChildren = append(newChildren, child.(*ElementNode))
 		}
 	}

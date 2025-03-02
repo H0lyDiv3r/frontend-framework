@@ -1,17 +1,7 @@
 package internals
 
-func DestroyDom(vdom any) {
-	// switch v := any(vdom).(type) {
-	// case types.StringDom:
-	// 	removeTextNode(v)
-	// 	v.El = js.Null()
-	// case types.Vdom:
-	// 	removeElementNode(v)
-	// 	v.El = js.Null()
-	// default:
-	// 	fmt.Println("can not destroy node of this type type")
-	// 	return
-	// }
+func DestroyDom(vdom Vdom) {
+	vdom.RemoveNode()
 }
 
 // func removeTextNode(vdom types.StringDom) {
