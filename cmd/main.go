@@ -5,6 +5,7 @@ import (
 	"go-fe-fwk/internals"
 	"go-fe-fwk/types"
 	"syscall/js"
+	"time"
 )
 
 func mountDom(this js.Value, args []js.Value) interface{} {
@@ -23,10 +24,13 @@ func mountDom(this js.Value, args []js.Value) interface{} {
 	// }
 	vdom := internals.H("p", props, []any{"aaaaaaaaaaaaa"})
 
-	internals.MountDom(vdom, args[0])
-	// time.Sleep(2 * time.Second)
-	// internals.DestroyDom(vdom)
-	fmt.Println(args[0])
+	_, vdm := internals.MountDom(vdom, args[0])
+
+	vdom = vdm
+
+	time.Sleep(2 * time.Second)
+	fmt.Println(args[0], vdom)
+	internals.DestroyDom(vdom)
 	return nil
 }
 

@@ -6,16 +6,19 @@ import (
 	"syscall/js"
 )
 
-func MountDom[T types.StringDom | types.Vdom | any](vdom T, parentEl js.Value) {
+func MountDom[T types.StringDom | types.Vdom | any](vdom T, parentEl js.Value) (types.StringDom, types.Vdom) {
 	switch v := any(vdom).(type) {
 	case types.StringDom:
-		CreateTextNode(v, parentEl)
+		CreateTextNode(&v, parentEl)
+		return v, types.Vdom{}
 	case types.Vdom:
-		CreateElementNode(v, parentEl)
+		CreateElementNode(&v, parentEl)
+		return types.StringDom{}, v
 	}
+	return types.StringDom{}, types.Vdom{}
 }
 
-func CreateTextNode(vdom types.StringDom, parentEl js.Value) {
+func CreateTextNode(vdom *types.StringDom, parentEl js.Value) {
 	document := js.Global().Get("document")
 	value := vdom.Value
 	textNode := document.Call("createTextNode", value)
@@ -23,7 +26,7 @@ func CreateTextNode(vdom types.StringDom, parentEl js.Value) {
 	parentEl.Call("appendChild", textNode)
 }
 
-func CreateElementNode(vdom types.Vdom, parentEl js.Value) {
+func CreateElementNode(vdom *types.Vdom, parentEl js.Value) {
 	document := js.Global().Get("document")
 	tag := vdom.Tag
 	props := vdom.Props
@@ -37,7 +40,7 @@ func CreateElementNode(vdom types.Vdom, parentEl js.Value) {
 	parentEl.Call("appendChild", element)
 }
 
-func addProps(element js.Value, props types.Props, vdom types.Vdom) {
+func addProps(element js.Value, props types.Props, vdom *types.Vdom) {
 	attributes := props.Attributes
 	eventHandlers := props.On
 	vdom.Listeners = utils.AddEventListeners(eventHandlers, element)

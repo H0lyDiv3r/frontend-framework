@@ -10,10 +10,10 @@ import (
 func DestroyDom(vdom any) {
 	switch v := any(vdom).(type) {
 	case types.StringDom:
-		removeTextNode(v)
+		removeTextNode(&v)
 		v.El = js.Null()
 	case types.Vdom:
-		removeElementNode(v)
+		removeElementNode(&v)
 		v.El = js.Null()
 	default:
 		fmt.Println("can not destroy node of this type type")
@@ -21,19 +21,19 @@ func DestroyDom(vdom any) {
 	}
 }
 
-func removeTextNode(vdom types.StringDom) {
+func removeTextNode(vdom *types.StringDom) {
 	fmt.Println("aaaaaaaaaaaaaaaaa destroying", vdom)
 	// element := vdom.El
 	// element.Call("remove")
 }
 
-func removeElementNode(vdom types.Vdom) {
+func removeElementNode(vdom *types.Vdom) {
 	fmt.Println("aaaaaaaaaaaa destroying el", vdom)
 	element := vdom.El
 	children := vdom.Children
 	listeners := vdom.Listeners
 	element.Set("className", "awaaww")
-	// element.Call("remove")
+	element.Call("remove")
 	for _, child := range children {
 		DestroyDom(child)
 	}
