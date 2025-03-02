@@ -5,16 +5,17 @@ import (
 	"reflect"
 )
 
-func H(tag string, props types.Props, children []any) types.Vdom {
-	newChildren := []any{}
-	for i := range children {
+func H(tag string, props types.Props, children []any) *ElementNode {
+	newChildren := []Vdom{}
+	for i, child := range children {
 		if reflect.TypeOf(children[i]) == reflect.TypeOf("") {
-			newChildren = append(newChildren, Hstring(children[i].(string)))
+			textNode := Hstring(child.(string))
+			newChildren = append(newChildren, &textNode)
 		} else {
-			newChildren = append(newChildren, children[i])
+			newChildren = append(newChildren, child.(*ElementNode))
 		}
 	}
-	return types.Vdom{
+	return &ElementNode{
 		Tag:      tag,
 		Props:    props,
 		Children: newChildren,
@@ -22,8 +23,8 @@ func H(tag string, props types.Props, children []any) types.Vdom {
 	}
 }
 
-func Hstring(value string) types.StringDom {
-	return types.StringDom{
+func Hstring(value string) StringDom {
+	return StringDom{
 		Type:  types.DOM_TYPES["TEXT"],
 		Value: value,
 	}

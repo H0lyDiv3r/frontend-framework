@@ -1,46 +1,39 @@
 package internals
 
-import (
-	"fmt"
-	"go-fe-fwk/pkgs/utils"
-	"go-fe-fwk/types"
-	"syscall/js"
-)
-
 func DestroyDom(vdom any) {
-	switch v := any(vdom).(type) {
-	case types.StringDom:
-		removeTextNode(v)
-		v.El = js.Null()
-	case types.Vdom:
-		removeElementNode(v)
-		v.El = js.Null()
-	default:
-		fmt.Println("can not destroy node of this type type")
-		return
-	}
+	// switch v := any(vdom).(type) {
+	// case types.StringDom:
+	// 	removeTextNode(v)
+	// 	v.El = js.Null()
+	// case types.Vdom:
+	// 	removeElementNode(v)
+	// 	v.El = js.Null()
+	// default:
+	// 	fmt.Println("can not destroy node of this type type")
+	// 	return
+	// }
 }
 
-func removeTextNode(vdom types.StringDom) {
-	fmt.Println("aaaaaaaaaaaaaaaaa destroying", vdom)
-	// element := vdom.El
-	// element.Call("remove")
-}
+// func removeTextNode(vdom types.StringDom) {
+// 	fmt.Println("aaaaaaaaaaaaaaaaa destroying", vdom)
+// 	// element := vdom.El
+// 	// element.Call("remove")
+// }
 
-func removeElementNode(vdom types.Vdom) {
-	fmt.Println("aaaaaaaaaaaa destroying el", vdom)
-	element := vdom.El
-	children := vdom.Children
-	listeners := vdom.Listeners
-	element.Set("className", "awaaww")
-	// element.Call("remove")
-	for _, child := range children {
-		DestroyDom(child)
-	}
-	fmt.Println("Removing this shit")
-	utils.RemoveEventListener(listeners, element)
-	vdom.Listeners = nil
-}
+// func removeElementNode(vdom types.Vdom) {
+// 	fmt.Println("aaaaaaaaaaaa destroying el", vdom)
+// 	element := vdom.El
+// 	children := vdom.Children
+// 	listeners := vdom.Listeners
+// 	element.Set("className", "awaaww")
+// 	// element.Call("remove")
+// 	for _, child := range children {
+// 		DestroyDom(child)
+// 	}
+// 	fmt.Println("Removing this shit")
+// 	utils.RemoveEventListener(listeners, element)
+// 	vdom.Listeners = nil
+// }
 
 // const removeElementNode = (vdom)=>{
 //     const {el,children, listeners} = vdom

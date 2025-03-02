@@ -22,11 +22,12 @@ func mountDom(this js.Value, args []js.Value) interface{} {
 	// 	}),
 	// }
 	vdom := internals.H("p", props, []any{"aaaaaaaaaaaaa"})
+	vdom.CreateNode(args[0])
+	fmt.Println(vdom)
 
-	internals.MountDom(vdom, args[0])
 	// time.Sleep(2 * time.Second)
+	// fmt.Println(args[0], vdom)
 	// internals.DestroyDom(vdom)
-	fmt.Println(args[0])
 	return nil
 }
 
