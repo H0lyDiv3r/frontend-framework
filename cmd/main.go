@@ -42,11 +42,37 @@ func remDom(this js.Value, args []js.Value) interface{} {
 	return nil
 }
 
+func mountWithApp(this js.Value, args []js.Value) interface{} {
+	var app internals.App
+	app.State = 0
+	app.Reducers = internals.Reducers{
+		"add": func(state any, value ...any) any {
+			newState, _ := state.(int)
+			val, _ := value[0].(int)
+			return newState + val
+		},
+	}
+	app.View = func(state any, emit func(eventName string, payload any)) internals.Vdom {
+		return internals.H("button", types.Props{}, []any{"aaaaaaaaaa"})
+	}
+	// emit := func(eventName string, payload any) {
+	// 	fmt.Printf("Event emitted: %s with payload: %v\n", eventName, payload)
+	// }
+	// vdm := app.View(app.State, emit)
+	// internals.MountDom(vdm, args[0])
+	p := app.CreateApp()
+	p["mount"](args[0])
+	fmt.Println("wwwwwwwaaaaaaaawwwwwwwwaaaaa", app)
+	return nil
+}
+
 func main() {
 
 	fmt.Println("wasm connected")
-	js.Global().Set("mountDom", js.FuncOf(mountDom))
-	js.Global().Set("removeDom", js.FuncOf(remDom))
+	// js.Global().Set("mountDom", js.FuncOf(mountDom))
+	// js.Global().Set("removeDom", js.FuncOf(remDom))
+
+	js.Global().Set("mountDom", js.FuncOf(mountWithApp))
 	<-make(chan struct{})
 	// props := types.Props{
 	// 	Attributes: types.Attributes[string]{

@@ -33,7 +33,7 @@ func (dispatcher *Dispatcher) AfterEveryCommand(handler func(payload ...any)) fu
 	}
 }
 
-func (dispatcher *Dispatcher) dispatch(commandName string, payload any) {
+func (dispatcher *Dispatcher) Dispatch(commandName string, payload any) {
 	if _, ok := dispatcher.Subs[commandName]; ok {
 		for _, handler := range dispatcher.Subs[commandName] {
 			handler(payload)
