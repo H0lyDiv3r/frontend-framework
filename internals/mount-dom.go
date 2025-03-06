@@ -13,12 +13,12 @@ type Vdom interface {
 }
 
 type ElementNode struct {
-	Tag       string              `json:"tag"`
-	Props     types.Props         `json:"props"`
-	Children  []Vdom              `json:"children"`
-	Type      string              `json:"type"`
-	Listeners map[string]js.Value `json:"listeners"`
-	El        js.Value            `json:"el"`
+	Tag       string             `json:"tag"`
+	Props     types.Props        `json:"props"`
+	Children  []Vdom             `json:"children"`
+	Type      string             `json:"type"`
+	Listeners map[string]js.Func `json:"listeners"`
+	El        js.Value           `json:"el"`
 }
 
 func (vdom *ElementNode) CreateNode(parentEl js.Value) {
@@ -28,6 +28,7 @@ func (vdom *ElementNode) CreateNode(parentEl js.Value) {
 	children := vdom.Children
 	element := document.Call("createElement", tag)
 	addProps(element, props, vdom)
+	// addPrp(element, props, vdom)
 	vdom.El = element
 	for _, child := range children {
 		MountDom(child, element)
@@ -80,4 +81,13 @@ func addProps(element js.Value, props types.Props, vdom *ElementNode) {
 	eventHandlers := props.On
 	vdom.Listeners = utils.AddEventListeners(eventHandlers, element)
 	utils.SetAttributes(element, attributes)
+}
+
+func addPrp(el js.Value, props types.Props, vdom *ElementNode) {
+	onClick := func(this js.Value, args []js.Value) any {
+		fmt.Println("aaaaaaaaaaaaaaaaaaaaaaaaaaa", props.On, vdom.Listeners)
+		return nil
+	}
+	utils.AddEventListeners(props.On, el)
+	el.Call("addEventListener", "click", js.FuncOf(onClick))
 }

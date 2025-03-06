@@ -11,7 +11,12 @@ var props = types.Props{
 	Attributes: types.Attributes[string]{
 		"class": "colored",
 	},
-	On: types.EventHandlers{},
+	On: types.EventHandlers{
+		"click": func(this js.Value, args []js.Value) interface{} {
+			fmt.Println("aaaaaaaaaaaaaaaaaaaaaaauuuuuuuu")
+			return nil
+		},
+	},
 }
 var vdom = internals.H("div", props, []any{
 	"aaaaaaaaa",
@@ -19,7 +24,7 @@ var vdom = internals.H("div", props, []any{
 })
 
 func mountDom(this js.Value, args []js.Value) interface{} {
-
+	vdm := internals.H("button", props, []any{"aaa"})
 	// l := []any{
 	// 	internals.H("ul", types.Props{}, []any{
 	// 		internals.H("li", types.Props{}, []any{"one"}),
@@ -28,7 +33,7 @@ func mountDom(this js.Value, args []js.Value) interface{} {
 	// }
 
 	// vdom.CreateNode(args[0])
-	internals.MountDom(vdom, args[0])
+	internals.MountDom(vdm, args[0])
 	fmt.Println(vdom)
 
 	// time.Sleep(2 * time.Second)
@@ -44,7 +49,7 @@ func remDom(this js.Value, args []js.Value) interface{} {
 
 func mountWithApp(this js.Value, args []js.Value) interface{} {
 	var app internals.App
-	app.State = 0
+	app.State = "0"
 	app.Reducers = internals.Reducers{
 		"add": func(state any, value ...any) any {
 			newState, _ := state.(int)
@@ -53,7 +58,7 @@ func mountWithApp(this js.Value, args []js.Value) interface{} {
 		},
 	}
 	app.View = func(state any, emit func(eventName string, payload any)) internals.Vdom {
-		return internals.H("button", types.Props{}, []any{"aaaaaaaaaa"})
+		return internals.H("button", types.Props{}, []any{app.State})
 	}
 	// emit := func(eventName string, payload any) {
 	// 	fmt.Printf("Event emitted: %s with payload: %v\n", eventName, payload)
@@ -69,10 +74,10 @@ func mountWithApp(this js.Value, args []js.Value) interface{} {
 func main() {
 
 	fmt.Println("wasm connected")
-	// js.Global().Set("mountDom", js.FuncOf(mountDom))
+	js.Global().Set("mountDom", js.FuncOf(mountDom))
 	// js.Global().Set("removeDom", js.FuncOf(remDom))
 
-	js.Global().Set("mountDom", js.FuncOf(mountWithApp))
+	// js.Global().Set("mountDom", js.FuncOf(mountWithApp))
 	<-make(chan struct{})
 	// props := types.Props{
 	// 	Attributes: types.Attributes[string]{

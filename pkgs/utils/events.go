@@ -5,13 +5,14 @@ import (
 	"syscall/js"
 )
 
-func AddEventListener(eventName string, handler js.Value, element js.Value) js.Value {
-	element.Call("addEventListener", eventName, handler)
-	return handler
+func AddEventListener(eventName string, handler func(this js.Value, args []js.Value) any, element js.Value) js.Func {
+	element.Call("addEventListener", eventName, js.FuncOf(handler))
+	return js.FuncOf(handler)
 }
 
-func AddEventListeners(listeners types.EventHandlers, element js.Value) map[string]js.Value {
-	var addedEventListeners map[string]js.Value
+func AddEventListeners(listeners types.EventHandlers, element js.Value) map[string]js.Func {
+	addedEventListeners := make(map[string]js.Func)
+
 	for eventName := range listeners {
 		listener := AddEventListener(eventName, listeners[eventName], element)
 		addedEventListeners[eventName] = listener
@@ -19,7 +20,7 @@ func AddEventListeners(listeners types.EventHandlers, element js.Value) map[stri
 	return addedEventListeners
 }
 
-func RemoveEventListener(listeners types.EventHandlers, element js.Value) {
+func RemoveEventListener(listeners map[string]js.Func, element js.Value) {
 	for eventName := range listeners {
 		element.Call("removeEventListener", eventName, listeners[eventName])
 	}
