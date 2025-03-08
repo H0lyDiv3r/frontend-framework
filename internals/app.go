@@ -9,9 +9,9 @@ import (
 type Reducers map[string]types.ReducerFunc
 
 type App struct {
-	State    any                                                                       `json:"state"`
-	View     func(state any, emit func(eventName string, payload map[string]any)) Vdom `json:"view"`
-	Reducers Reducers                                                                  `json:"reducers"`
+	State    map[string]any                                                                       `json:"state"`
+	View     func(state map[string]any, emit func(eventName string, payload map[string]any)) Vdom `json:"view"`
+	Reducers Reducers                                                                             `json:"reducers"`
 }
 
 func (app *App) CreateApp() map[string]func(parentEl js.Value) {
@@ -35,7 +35,7 @@ func (app *App) CreateApp() map[string]func(parentEl js.Value) {
 	afterHandler := dispatcher.AfterEveryCommand(renderApp)
 	subscriptions := []func(){afterHandler}
 	for actionName, reducer := range app.Reducers {
-		subs := dispatcher.Subscribe(actionName, func(state any, payload map[string]any) any {
+		subs := dispatcher.Subscribe(actionName, func(state map[string]any, payload map[string]any) map[string]any {
 			app.State = reducer(app.State, payload)
 			return nil
 		})
