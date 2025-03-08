@@ -1,7 +1,6 @@
 package internals
 
 import (
-	"fmt"
 	"go-fe-fwk/pkgs/utils"
 	"go-fe-fwk/types"
 	"syscall/js"
@@ -28,7 +27,6 @@ func (vdom *ElementNode) CreateNode(parentEl js.Value) {
 	children := vdom.Children
 	element := document.Call("createElement", tag)
 	addProps(element, props, vdom)
-	// addPrp(element, props, vdom)
 	vdom.El = element
 	for _, child := range children {
 		MountDom(child, element)
@@ -37,7 +35,7 @@ func (vdom *ElementNode) CreateNode(parentEl js.Value) {
 }
 
 func (vdom *ElementNode) RemoveNode() {
-	fmt.Println("aaaaaaaaaaaa destroying el", vdom)
+	// fmt.Println("aaaaaaaaaaaa destroying el", vdom)
 	element := vdom.El
 	children := vdom.Children
 	listeners := vdom.Listeners
@@ -46,7 +44,7 @@ func (vdom *ElementNode) RemoveNode() {
 	for _, child := range children {
 		DestroyDom(child)
 	}
-	fmt.Println("Removing this shit")
+	// fmt.Println("Removing this shit")
 	utils.RemoveEventListener(listeners, element)
 	vdom.Listeners = nil
 }
@@ -66,13 +64,13 @@ func (vdom *StringDom) CreateNode(parentEl js.Value) {
 }
 
 func (vdom *StringDom) RemoveNode() {
-	fmt.Println("aaaaaaaaaaaaaaaaa destroying", vdom)
+	// fmt.Println("aaaaaaaaaaaaaaaaa destroying", vdom)
 	element := vdom.El
 	element.Call("remove")
 }
 
 func MountDom(vdom Vdom, parentEl js.Value) {
-	fmt.Println("printing the pointer", vdom)
+	// fmt.Println("printing the pointer", vdom)
 	vdom.CreateNode(parentEl)
 }
 
@@ -81,13 +79,4 @@ func addProps(element js.Value, props types.Props, vdom *ElementNode) {
 	eventHandlers := props.On
 	vdom.Listeners = utils.AddEventListeners(eventHandlers, element)
 	utils.SetAttributes(element, attributes)
-}
-
-func addPrp(el js.Value, props types.Props, vdom *ElementNode) {
-	onClick := func(this js.Value, args []js.Value) any {
-		fmt.Println("aaaaaaaaaaaaaaaaaaaaaaaaaaa", props.On, vdom.Listeners)
-		return nil
-	}
-	utils.AddEventListeners(props.On, el)
-	el.Call("addEventListener", "click", js.FuncOf(onClick))
 }

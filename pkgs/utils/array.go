@@ -1,6 +1,9 @@
 package utils
 
-import "reflect"
+import (
+	"go-fe-fwk/types"
+	"reflect"
+)
 
 // func WithoutNulls(arr []internals.Vdom) []internals.Vdom {
 // 	var newArr = make([]internals.Vdom, 0, len(arr))
@@ -12,8 +15,9 @@ import "reflect"
 //		}
 //		return newArr
 //	}
+
 func WithoutNulls() {}
-func FuncExists(funcArray []func(payload ...any), target func(payload ...any)) bool {
+func FuncExists(funcArray []types.JsFunc, target types.JsFunc) bool {
 	for _, f := range funcArray {
 		if reflect.ValueOf(f).Pointer() == reflect.ValueOf(target).Pointer() {
 			return true
@@ -22,7 +26,16 @@ func FuncExists(funcArray []func(payload ...any), target func(payload ...any)) b
 	return false
 }
 
-func IndexOfFunction(arr []func(payload ...any), target func(payload ...any)) int {
+func IndexOfFunction(arr []types.JsFunc, target types.JsFunc) int {
+	for i, f := range arr {
+		if reflect.ValueOf(f).Pointer() == reflect.ValueOf(target).Pointer() {
+			return i
+		}
+	}
+	return -1
+}
+
+func IndexOfVariadicFunction(arr []func(payload ...any), target func(payload ...any)) int {
 	for i, f := range arr {
 		if reflect.ValueOf(f).Pointer() == reflect.ValueOf(target).Pointer() {
 			return i

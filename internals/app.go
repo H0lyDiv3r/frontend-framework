@@ -2,10 +2,11 @@ package internals
 
 import (
 	"fmt"
+	"go-fe-fwk/types"
 	"syscall/js"
 )
 
-type Reducers map[string]func(state any, payload ...any) any
+type Reducers map[string]func(this js.Value, args []js.Value) any
 
 type App struct {
 	State    any                                                            `json:"state"`
@@ -13,11 +14,12 @@ type App struct {
 	Reducers Reducers                                                       `json:"reducers"`
 }
 
-func (this *App) CreateApp() map[string]func(parentEl js.Value) {
+func (app *App) CreateApp() map[string]func(parentEl js.Value) {
+	fmt.Println("CREATING THIS APP")
 	var parentEl js.Value
 	var vdom Vdom = nil
 
-	var dispatcher Dispatcher = Dispatcher{Subs: map[string][]func(payload ...any){}}
+	var dispatcher Dispatcher = Dispatcher{Subs: map[string][]types.JsFunc{}, AfterHandlers: []func(payload ...any){}}
 	emit := func(eventName string, payload any) {
 		dispatcher.Dispatch(eventName, payload)
 	}
@@ -25,15 +27,20 @@ func (this *App) CreateApp() map[string]func(parentEl js.Value) {
 		if vdom != nil {
 			DestroyDom(vdom)
 		}
-		vdom = this.View(this.State, emit)
+		fmt.Println("RE RENDERING THE APP")
+		vdom = app.View(app.State, emit)
 		MountDom(vdom, parentEl)
 	}
-	subscriptions := []func(){dispatcher.AfterEveryCommand(renderApp)}
-	for actionName, reducer := range this.Reducers {
-		subs := dispatcher.Subscribe(actionName, func(payload ...any) {
-			this.State = reducer(this.State, payload[0])
+	afterHandler := dispatcher.AfterEveryCommand(renderApp)
+	subscriptions := []func(){afterHandler}
+	for actionName, reducer := range app.Reducers {
+		subs := dispatcher.Subscribe(actionName, func(this js.Value, args []js.Value) any {
+			args = append(args, js.ValueOf(app.State))
+			app.State = reducer(js.Undefined(), args)
+			return nil
 		})
 		subscriptions = append(subscriptions, subs)
+		fmt.Println("subscribing the functions.", dispatcher.Subs)
 	}
 
 	return map[string]func(payload js.Value){

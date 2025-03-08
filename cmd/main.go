@@ -49,16 +49,28 @@ func remDom(this js.Value, args []js.Value) interface{} {
 
 func mountWithApp(this js.Value, args []js.Value) interface{} {
 	var app internals.App
-	app.State = "0"
+	app.State = 0
 	app.Reducers = internals.Reducers{
-		"add": func(state any, value ...any) any {
-			newState, _ := state.(int)
-			val, _ := value[0].(int)
-			return newState + val
+		"add": func(this js.Value, args []js.Value) any {
+			state := args[1]
+			val := args[0]
+			fmt.Println("emmitting from adddddddd babat", state, val)
+			return 10
 		},
 	}
 	app.View = func(state any, emit func(eventName string, payload any)) internals.Vdom {
-		return internals.H("button", types.Props{}, []any{app.State})
+		return internals.H("button", types.Props{
+			Attributes: types.Attributes[string]{
+				"class": "colored",
+			},
+			On: types.EventHandlers{
+				"click": func(this js.Value, args []js.Value) interface{} {
+					fmt.Println("button clicked")
+					emit("add", 5)
+					return nil
+				},
+			},
+		}, []any{"aaa"})
 	}
 	// emit := func(eventName string, payload any) {
 	// 	fmt.Printf("Event emitted: %s with payload: %v\n", eventName, payload)
@@ -67,17 +79,16 @@ func mountWithApp(this js.Value, args []js.Value) interface{} {
 	// internals.MountDom(vdm, args[0])
 	p := app.CreateApp()
 	p["mount"](args[0])
-	fmt.Println("wwwwwwwaaaaaaaawwwwwwwwaaaaa", app)
 	return nil
 }
 
 func main() {
 
 	fmt.Println("wasm connected")
-	js.Global().Set("mountDom", js.FuncOf(mountDom))
+	// js.Global().Set("mountDom", js.FuncOf(mountDom))
 	// js.Global().Set("removeDom", js.FuncOf(remDom))
 
-	// js.Global().Set("mountDom", js.FuncOf(mountWithApp))
+	js.Global().Set("mountDom", js.FuncOf(mountWithApp))
 	<-make(chan struct{})
 	// props := types.Props{
 	// 	Attributes: types.Attributes[string]{
