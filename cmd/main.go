@@ -63,10 +63,12 @@ func mountWithApp(this js.Value, args []js.Value) interface{} {
 		stringState := fmt.Sprint(state)
 		fmt.Println("i am coming from here with", string(stringState))
 		input := internals.H("input", types.Props{
-			Attributes: types.Attributes[string]{},
+			Attributes: types.Attributes[string]{
+				"placeholder": "this is a placeholder",
+			},
 			On: types.EventHandlers{
 				"change": func(this js.Value, args []js.Value) interface{} {
-					fmt.Println("changed", this)
+					fmt.Println("changed", this.Get("value"), args)
 					return nil
 				},
 			},
