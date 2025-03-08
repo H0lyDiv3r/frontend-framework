@@ -4,47 +4,46 @@ import (
 	"fmt"
 	"go-fe-fwk/pkgs/utils"
 	"go-fe-fwk/types"
-	"syscall/js"
 )
 
 type Dispatcher struct {
-	Subs          map[string][]types.JsFunc `json:"subs"`
-	AfterHandlers []func(payload ...any)    `json:"afterHandlers"`
+	Subs          map[string][]types.ReducerFunc `json:"subs"`
+	AfterHandlers []types.AnyFunc                `json:"afterHandlers"`
 }
 
-func (dispatcher *Dispatcher) Subscribe(commandName string, handler types.JsFunc) func() {
+func (dispatcher *Dispatcher) Subscribe(commandName string, handler types.ReducerFunc) func() {
 	if _, ok := dispatcher.Subs[commandName]; !ok {
-		dispatcher.Subs[commandName] = []types.JsFunc{}
+		dispatcher.Subs[commandName] = []types.ReducerFunc{}
 	}
 	handlers := dispatcher.Subs[commandName]
-	if utils.FuncExists(handlers, handler) {
+	if utils.ReducerFuncExists(handlers, handler) {
 		return func() {}
 	}
 	handlers = append(handlers, handler)
 	dispatcher.Subs[commandName] = handlers
 	return func() {
-		idx := utils.IndexOfFunction(handlers, handler)
+		idx := utils.IndexOfReducerFunction(handlers, handler)
 		handlers = append(handlers[:idx], handlers[idx+1:]...)
 	}
 }
 
-func (dispatcher *Dispatcher) AfterEveryCommand(handler func(payload ...any)) func() {
+func (dispatcher *Dispatcher) AfterEveryCommand(handler types.AnyFunc) func() {
 	dispatcher.AfterHandlers = append(dispatcher.AfterHandlers, handler)
 	return func() {
-		idx := utils.IndexOfVariadicFunction(dispatcher.AfterHandlers, handler)
+		idx := utils.IndexOfFunction(dispatcher.AfterHandlers, handler)
 		if idx != -1 {
 			dispatcher.AfterHandlers = append(dispatcher.AfterHandlers[:idx], dispatcher.AfterHandlers[idx+1:]...)
 		}
 	}
 }
 
-func (dispatcher *Dispatcher) Dispatch(commandName string, payload any) {
+func (dispatcher *Dispatcher) Dispatch(commandName string, payload map[string]any) {
 	if _, ok := dispatcher.Subs[commandName]; ok {
 		fmt.Println("dispatching", commandName, dispatcher.Subs[commandName])
 
 		for _, handler := range dispatcher.Subs[commandName] {
 			fmt.Println("dispatching inside loop", commandName, payload)
-			handler(js.Undefined(), []js.Value{js.ValueOf(payload)})
+			handler(nil, payload)
 		}
 	} else {
 		fmt.Println("there is no command by that name")

@@ -4,6 +4,8 @@ import "syscall/js"
 
 type Attributes[T string | []string] map[string]T
 type JsFunc func(this js.Value, args []js.Value) any
+type AnyFunc func(payload ...any) any
+type ReducerFunc func(state any, payload map[string]any) any
 type EventHandlers map[string]func(this js.Value, args []js.Value) interface{}
 type Props struct {
 	Attributes Attributes[string] `json:"attribute"`

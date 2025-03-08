@@ -6,12 +6,12 @@ import (
 	"syscall/js"
 )
 
-type Reducers map[string]func(this js.Value, args []js.Value) any
+type Reducers map[string]types.ReducerFunc
 
 type App struct {
-	State    any                                                            `json:"state"`
-	View     func(state any, emit func(eventName string, payload any)) Vdom `json:"view"`
-	Reducers Reducers                                                       `json:"reducers"`
+	State    any                                                                       `json:"state"`
+	View     func(state any, emit func(eventName string, payload map[string]any)) Vdom `json:"view"`
+	Reducers Reducers                                                                  `json:"reducers"`
 }
 
 func (app *App) CreateApp() map[string]func(parentEl js.Value) {
@@ -19,24 +19,24 @@ func (app *App) CreateApp() map[string]func(parentEl js.Value) {
 	var parentEl js.Value
 	var vdom Vdom = nil
 
-	var dispatcher Dispatcher = Dispatcher{Subs: map[string][]types.JsFunc{}, AfterHandlers: []func(payload ...any){}}
-	emit := func(eventName string, payload any) {
+	var dispatcher Dispatcher = Dispatcher{Subs: map[string][]types.ReducerFunc{}, AfterHandlers: []types.AnyFunc{}}
+	emit := func(eventName string, payload map[string]any) {
 		dispatcher.Dispatch(eventName, payload)
 	}
-	renderApp := func(payload ...any) {
+	renderApp := func(payload ...any) any {
 		if vdom != nil {
 			DestroyDom(vdom)
 		}
 		fmt.Println("RE RENDERING THE APP")
 		vdom = app.View(app.State, emit)
 		MountDom(vdom, parentEl)
+		return nil
 	}
 	afterHandler := dispatcher.AfterEveryCommand(renderApp)
 	subscriptions := []func(){afterHandler}
 	for actionName, reducer := range app.Reducers {
-		subs := dispatcher.Subscribe(actionName, func(this js.Value, args []js.Value) any {
-			args = append(args, js.ValueOf(app.State))
-			app.State = reducer(js.Undefined(), args)
+		subs := dispatcher.Subscribe(actionName, func(state any, payload map[string]any) any {
+			app.State = reducer(app.State, payload)
 			return nil
 		})
 		subscriptions = append(subscriptions, subs)
