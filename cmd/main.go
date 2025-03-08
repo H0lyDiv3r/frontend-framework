@@ -49,43 +49,46 @@ func remDom(this js.Value, args []js.Value) interface{} {
 
 func mountWithApp(this js.Value, args []js.Value) interface{} {
 	var app internals.App
-	app.State = 0
+	app.State = map[string]any{
+		"count": 0,
+	}
 	app.Reducers = internals.Reducers{
-		"add": func(state any, payload map[string]any) any {
+		"add": func(state map[string]any, payload map[string]any) map[string]any {
 			// state := payload[0]
 			// val := payload[1]
+			state["count"] = state["count"].(int) + payload["count"].(int)
 			fmt.Println("emmitting from adddddddd babat", state, payload)
-			return state.(int) + payload["count"].(int)
+			return state
 		},
 	}
-	app.View = func(state any, emit func(eventName string, payload map[string]any)) internals.Vdom {
+	app.View = func(state map[string]any, emit func(eventName string, payload map[string]any)) internals.Vdom {
 
-		stringState := fmt.Sprint(state)
+		stringState := fmt.Sprint(state["count"])
 		fmt.Println("i am coming from here with", string(stringState))
-		input := internals.H("input", types.Props{
-			Attributes: types.Attributes[string]{
-				"placeholder": "this is a placeholder",
-			},
-			On: types.EventHandlers{
-				"change": func(this js.Value, args []js.Value) interface{} {
-					fmt.Println("changed", this.Get("value"), args)
-					return nil
-				},
-			},
-		}, []any{})
-		return input
-		// return internals.H("button", types.Props{
+		// input := internals.H("input", types.Props{
 		// 	Attributes: types.Attributes[string]{
-		// 		"class": "colored",
+		// 		"placeholder": "this is a placeholder",
 		// 	},
 		// 	On: types.EventHandlers{
-		// 		"click": func(this js.Value, args []js.Value) interface{} {
-		// 			fmt.Println("button clicked")
-		// 			emit("add", map[string]any{"count": 5})
+		// 		"change": func(this js.Value, args []js.Value) interface{} {
+		// 			fmt.Println("changed", this.Get("value"), args)
 		// 			return nil
 		// 		},
 		// 	},
-		// }, []any{stringState})
+		// }, []any{})
+		// return input
+		return internals.H("button", types.Props{
+			Attributes: types.Attributes[string]{
+				"class": "colored",
+			},
+			On: types.EventHandlers{
+				"click": func(this js.Value, args []js.Value) interface{} {
+					fmt.Println("button clicked")
+					emit("add", map[string]any{"count": 5})
+					return nil
+				},
+			},
+		}, []any{stringState})
 	}
 	// emit := func(eventName string, payload any) {
 	// 	fmt.Printf("Event emitted: %s with payload: %v\n", eventName, payload)
