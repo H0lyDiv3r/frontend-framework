@@ -51,26 +51,39 @@ func mountWithApp(this js.Value, args []js.Value) interface{} {
 	var app internals.App
 	app.State = 0
 	app.Reducers = internals.Reducers{
-		"add": func(this js.Value, args []js.Value) any {
-			state := args[1]
-			val := args[0]
-			fmt.Println("emmitting from adddddddd babat", state, val)
-			return 10
+		"add": func(state any, payload map[string]any) any {
+			// state := payload[0]
+			// val := payload[1]
+			fmt.Println("emmitting from adddddddd babat", state, payload)
+			return state.(int) + payload["count"].(int)
 		},
 	}
-	app.View = func(state any, emit func(eventName string, payload any)) internals.Vdom {
-		return internals.H("button", types.Props{
-			Attributes: types.Attributes[string]{
-				"class": "colored",
-			},
+	app.View = func(state any, emit func(eventName string, payload map[string]any)) internals.Vdom {
+
+		stringState := fmt.Sprint(state)
+		fmt.Println("i am coming from here with", string(stringState))
+		input := internals.H("input", types.Props{
+			Attributes: types.Attributes[string]{},
 			On: types.EventHandlers{
-				"click": func(this js.Value, args []js.Value) interface{} {
-					fmt.Println("button clicked")
-					emit("add", 5)
+				"change": func(this js.Value, args []js.Value) interface{} {
+					fmt.Println("changed", this)
 					return nil
 				},
 			},
-		}, []any{"aaa"})
+		}, []any{})
+		return input
+		// return internals.H("button", types.Props{
+		// 	Attributes: types.Attributes[string]{
+		// 		"class": "colored",
+		// 	},
+		// 	On: types.EventHandlers{
+		// 		"click": func(this js.Value, args []js.Value) interface{} {
+		// 			fmt.Println("button clicked")
+		// 			emit("add", map[string]any{"count": 5})
+		// 			return nil
+		// 		},
+		// 	},
+		// }, []any{stringState})
 	}
 	// emit := func(eventName string, payload any) {
 	// 	fmt.Printf("Event emitted: %s with payload: %v\n", eventName, payload)
